@@ -1,0 +1,17 @@
+[[redirects]]
+  from = "/"
+  to = "/portfolio/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/admin"
+  to = "/admin/login.html"
+  status = 302
+
+[[redirects]]
+  from = "/portfolio"
+  to = "/portfolio/index.html"
+  status = 200
+
+[build]
+  publish = "."

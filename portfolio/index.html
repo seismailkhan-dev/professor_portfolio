@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title id="pageTitle">Professor Portfolio</title>
+  <meta name="description" id="pageDesc" content="Academic portfolio" />
+  <link rel="stylesheet" href="../assets/css/portfolio.css" />
+</head>
+<body>
+
+<!-- ── NAVIGATION ────────────────────────────────────────────── -->
+<nav class="site-nav">
+  <div class="nav-inner">
+    <div class="nav-brand" id="navBrand">Portfolio</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#lectures">Lectures</a></li>
+      <li><a href="#publications">Research</a></li>
+      <li><a href="#courses">Courses</a></li>
+      <li><a href="#blog">Articles</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-lang">
+      <button class="active" onclick="setLang('en', this)">EN</button>
+      <button onclick="setLang('ur', this)">اردو</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────────── -->
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-tag">Academic Portfolio</div>
+      <h1 class="hero-name" id="heroName"><em>Professor</em></h1>
+      <div class="hero-title" id="heroTitle">Loading...</div>
+      <div class="hero-dept" id="heroDept"></div>
+      <p class="hero-bio" id="heroBio">Loading profile...</p>
+      <div class="hero-actions">
+        <a href="#" id="cvDownloadBtn" class="btn-hero-primary" style="display:none">
+          ⬇ Download CV
+        </a>
+        <a href="#contact" class="btn-hero-outline">Get in touch →</a>
+      </div>
+      <div class="hero-stats" id="heroStats">
+        <div class="hero-stat"><div class="num" id="statLectures">—</div><div class="label">Lectures</div></div>
+        <div class="hero-stat"><div class="num" id="statPubs">—</div><div class="label">Publications</div></div>
+        <div class="hero-stat"><div class="num" id="statCourses">—</div><div class="label">Courses</div></div>
+        <div class="hero-stat"><div class="num" id="statExp">—</div><div class="label">Years Exp.</div></div>
+      </div>
+    </div>
+
+    <div class="hero-photo-wrap">
+      <div id="heroPhotoContainer">
+        <div class="hero-photo-placeholder" id="heroPhotoPlaceholder">P</div>
+      </div>
+      <div class="hero-photo-frame"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────────────────────── -->
+<section id="about">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag">About</div>
+      <h2 class="section-title">Academic <em>Journey</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text fade-up">
+        <p id="aboutBioFull">Loading biography...</p>
+        <div class="research-tags" id="researchTags"></div>
+      </div>
+      <div class="about-highlights fade-up" id="aboutHighlights">
+        <!-- Loaded from profile -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LECTURES ────────────────────────────────────────────────── -->
+<section class="lectures-section" id="lectures">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag">Lectures</div>
+      <h2 class="section-title">Video <em>Lectures</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="lecture-filter fade-up" id="lectureFilterBar">
+      <button class="filter-btn active" onclick="filterPortfolioLectures('all', this)">All</button>
+    </div>
+    <div class="lectures-grid fade-up" id="lecturesGrid">
+      <div class="loading-shimmer" style="height:200px"></div>
+      <div class="loading-shimmer" style="height:200px"></div>
+      <div class="loading-shimmer" style="height:200px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PUBLICATIONS ────────────────────────────────────────────── -->
+<section id="publications" style="background: var(--ivory-2)">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag">Research</div>
+      <h2 class="section-title">Publications & <em>Research</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="pub-list fade-up" id="pubList">
+      <div class="loading-shimmer" style="height:90px"></div>
+      <div class="loading-shimmer" style="height:90px;margin-top:16px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COURSES ─────────────────────────────────────────────────── -->
+<section class="courses-section" id="courses">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag" style="color:var(--gold)">Teaching</div>
+      <h2 class="section-title">Courses <em>Taught</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="courses-grid fade-up" id="coursesGrid">
+      <div class="loading-shimmer" style="height:140px;opacity:0.15"></div>
+      <div class="loading-shimmer" style="height:140px;opacity:0.1"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── BLOG ────────────────────────────────────────────────────── -->
+<section id="blog">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag">Articles</div>
+      <h2 class="section-title">Blog & <em>Insights</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="blog-grid fade-up" id="blogGrid">
+      <div class="loading-shimmer" style="height:200px"></div>
+      <div class="loading-shimmer" style="height:200px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ─────────────────────────────────────────────────── -->
+<section class="contact-section" id="contact">
+  <div class="section-inner">
+    <div class="section-header fade-up">
+      <div class="section-tag">Contact</div>
+      <h2 class="section-title">Get in <em>Touch</em></h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info fade-up" id="contactInfo">
+        <!-- Loaded from profile -->
+      </div>
+      <div class="contact-form fade-up">
+        <div id="contactFormStatus" style="display:none;padding:12px;border-radius:8px;margin-bottom:1rem;font-size:14px"></div>
+        <div class="form-group">
+          <label>Your Name</label>
+          <input type="text" id="cfName" placeholder="Your full name" />
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="cfEmail" placeholder="your@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Message</label>
+          <textarea id="cfMessage" placeholder="Your message..."></textarea>
+        </div>
+        <button onclick="submitContactForm()">Send Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-name" id="footerName">Professor Portfolio</div>
+    <div class="footer-sub" id="footerSub">Academic Portfolio</div>
+  </div>
+</footer>
+
+<!-- ── VIDEO MODAL ─────────────────────────────────────────────── -->
+<div class="video-overlay" id="videoOverlay" onclick="closeVideo(event)">
+  <button class="video-modal-close" onclick="closeVideoModal()">✕</button>
+  <div class="video-modal">
+    <iframe id="videoFrame" src="" allowfullscreen></iframe>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script>
+
+// ── State ──────────────────────────────────────────────────────────
+let allLectures = [];
+let currentLang = 'en';
+
+// ── Init ───────────────────────────────────────────────────────────
+(async () => {
+  initSupabase();
+  await Promise.all([
+    loadPortfolioProfile(),
+    loadPortfolioLectures(),
+    loadPortfolioPubs(),
+    loadPortfolioCourses(),
+    loadPortfolioBlog(),
+  ]);
+  initScrollAnimations();
+})();
+
+// ── Profile ────────────────────────────────────────────────────────
+async function loadPortfolioProfile() {
+  const { data } = await getProfile();
+  if (!data) return;
+
+  const name = data.name || 'Professor';
+  const nameUr = data.name_ur || '';
+  const title = data.title || '';
+  const dept = data.department || '';
+  const univ = data.university || '';
+  const bio = data.bio || '';
+
+  document.title = name + ' | Portfolio';
+  document.getElementById('pageDesc').content = title + ', ' + dept + ', ' + univ;
+  document.getElementById('navBrand').textContent = name.split(' ').slice(-1)[0];
+
+  document.getElementById('heroName').innerHTML = formatName(name);
+  document.getElementById('heroTitle').textContent = title;
+  document.getElementById('heroDept').textContent = [dept, univ].filter(Boolean).join(' · ');
+  document.getElementById('heroBio').textContent = bio;
+  document.getElementById('aboutBioFull').textContent = bio;
+  document.getElementById('footerName').textContent = name;
+  document.getElementById('footerSub').textContent = [title, univ].filter(Boolean).join(' · ');
+
+  // Photo
+  if (data.photo_url) {
+    document.getElementById('heroPhotoContainer').innerHTML =
+      `<img src="${data.photo_url}" class="hero-photo" alt="${name}" />`;
+  } else {
+    const initials = name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    document.getElementById('heroPhotoPlaceholder').textContent = initials;
+  }
+
+  // Stats
+  document.getElementById('statExp').textContent = data.years_experience || '—';
+
+  // CV
+  if (data.cv_url) {
+    const btn = document.getElementById('cvDownloadBtn');
+    btn.href = data.cv_url;
+    btn.style.display = 'inline-flex';
+  }
+
+  // Research interests
+  if (data.research_interests) {
+    const tags = data.research_interests.split(',').map(t=>t.trim()).filter(Boolean);
+    document.getElementById('researchTags').innerHTML = tags.map(t =>
+      `<span class="research-tag">${t}</span>`
+    ).join('');
+  }
+
+  // Highlights
+  const highlights = [
+    { icon: '🎓', title: title, sub: dept },
+    { icon: '🏛️', title: univ, sub: 'University Affiliation' },
+    data.office ? { icon: '📍', title: data.office, sub: 'Office Location' } : null,
+    data.office_hours ? { icon: '⏰', title: data.office_hours, sub: 'Office Hours' } : null,
+  ].filter(Boolean);
+
+  document.getElementById('aboutHighlights').innerHTML = highlights.map(h => `
+    <div class="highlight-card">
+      <div class="highlight-icon">${h.icon}</div>
+      <div>
+        <h4>${h.title}</h4>
+        <p>${h.sub}</p>
+      </div>
+    </div>
+  `).join('');
+
+  // Contact info
+  let contactHTML = '';
+  if (data.email) contactHTML += contactItem('✉️', 'Email', `<a href="mailto:${data.email}">${data.email}</a>`);
+  if (data.phone) contactHTML += contactItem('📞', 'Phone', data.phone);
+  if (data.office) contactHTML += contactItem('📍', 'Office', data.office);
+  if (data.office_hours) contactHTML += contactItem('⏰', 'Office Hours', data.office_hours);
+  document.getElementById('contactInfo').innerHTML = contactHTML;
+
+  // Social links
+  const socials = [
+    { url: data.scholar_url, label: 'Google Scholar', icon: '🎓' },
+    { url: data.linkedin_url, label: 'LinkedIn', icon: '💼' },
+    { url: data.researchgate_url, label: 'ResearchGate', icon: '🔬' },
+    { url: data.univ_profile_url, label: 'University Profile', icon: '🏛️' },
+  ].filter(s => s.url);
+
+  if (socials.length) {
+    document.getElementById('contactInfo').innerHTML += `
+      <div class="social-links">
+        ${socials.map(s => `<a href="${s.url}" target="_blank" class="social-link">${s.icon} ${s.label}</a>`).join('')}
+      </div>
+    `;
+  }
+}
+
+function contactItem(icon, label, value) {
+  return `
+    <div class="item">
+      <div class="contact-icon">${icon}</div>
+      <div>
+        <div class="item-label">${label}</div>
+        <div class="item-value">${value}</div>
+      </div>
+    </div>
+  `;
+}
+
+function formatName(name) {
+  const parts = name.trim().split(' ');
+  if (parts.length >= 2) {
+    const last = parts.pop();
+    return `${parts.join(' ')} <em>${last}</em>`;
+  }
+  return `<em>${name}</em>`;
+}
+
+// ── Lectures ───────────────────────────────────────────────────────
+async function loadPortfolioLectures() {
+  const { data } = await getLectures();
+  allLectures = data || [];
+
+  document.getElementById('statLectures').textContent = allLectures.length;
+
+  const categories = [...new Set(allLectures.map(l => l.category).filter(Boolean))];
+  const filterBar = document.getElementById('lectureFilterBar');
+  filterBar.innerHTML = `<button class="filter-btn active" onclick="filterPortfolioLectures('all', this)">All (${allLectures.length})</button>`;
+  categories.forEach(cat => {
+    const count = allLectures.filter(l => l.category === cat).length;
+    filterBar.innerHTML += `<button class="filter-btn" onclick="filterPortfolioLectures('${cat}', this)">${cat} (${count})</button>`;
+  });
+
+  renderPortfolioLectures(allLectures);
+}
+
+function filterPortfolioLectures(cat, btn) {
+  document.querySelectorAll('.lecture-filter .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const filtered = cat === 'all' ? allLectures : allLectures.filter(l => l.category === cat);
+  renderPortfolioLectures(filtered);
+}
+
+function renderPortfolioLectures(data) {
+  const grid = document.getElementById('lecturesGrid');
+  if (!data.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-3)">No lectures available yet.</div>`;
+    return;
+  }
+  grid.innerHTML = data.map(l => {
+    const vid = extractYouTubeId(l.youtube_url || '');
+    const thumb = vid ? getYouTubeThumbnail(vid) : '';
+    return `
+    <div class="lecture-card" onclick="openVideo('${vid}')">
+      <div class="lecture-thumb">
+        ${thumb ? `<img src="${thumb}" alt="${l.title}" loading="lazy" />` : `<div style="width:100%;height:100%;background:var(--navy-3)"></div>`}
+        <div class="lecture-play"><div class="play-circle">▶</div></div>
+        ${l.category ? `<span class="lecture-category-badge">${l.category}</span>` : ''}
+      </div>
+      <div class="lecture-body">
+        ${l.lecture_number ? `<div class="lecture-num">${l.lecture_number}</div>` : ''}
+        <div class="lecture-title">${l.title}</div>
+        ${l.description ? `<div class="lecture-desc">${l.description}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Publications ───────────────────────────────────────────────────
+async function loadPortfolioPubs() {
+  const { data } = await getPublications();
+  const pubs = data || [];
+  document.getElementById('statPubs').textContent = pubs.length;
+
+  const typeIcon = { journal: '📄', conference: '🎤', book: '📚', thesis: '🎓', other: '📌' };
+  const statusBadge = { published: 'pub-badge-published', accepted: 'pub-badge-accepted', under_review: 'pub-badge-review' };
+
+  document.getElementById('pubList').innerHTML = pubs.length ? pubs.map(p => `
+    <div class="pub-card">
+      <div class="pub-year-col">
+        <div class="pub-year">${p.year || '—'}</div>
+        <div class="pub-type-icon">${typeIcon[p.type] || '📌'}</div>
+      </div>
+      <div class="pub-body">
+        <div class="pub-title">${p.doi_url ? `<a href="${p.doi_url}" target="_blank">${p.title}</a>` : p.title}</div>
+        <div class="pub-journal">${p.journal_name || ''}</div>
+        <div class="pub-badges">
+          ${p.status ? `<span class="pub-badge ${statusBadge[p.status]||'pub-badge-type'}">${p.status.replace('_',' ')}</span>` : ''}
+          <span class="pub-badge pub-badge-type">${(p.type||'journal').replace('_',' ')}</span>
+        </div>
+      </div>
+    </div>
+  `).join('') : `<div style="text-align:center;padding:3rem;color:var(--text-3)">No publications listed yet.</div>`;
+}
+
+// ── Courses ────────────────────────────────────────────────────────
+async function loadPortfolioCourses() {
+  const { data } = await getCourses();
+  const courses = data || [];
+  document.getElementById('statCourses').textContent = courses.length;
+
+  document.getElementById('coursesGrid').innerHTML = courses.length ? courses.map(c => `
+    <div class="course-card">
+      <div class="course-code">${c.course_code || 'COURSE'}</div>
+      <div class="course-title">${c.course_title}</div>
+      <div class="course-semester">${c.semester || ''}</div>
+      ${c.description ? `<div class="course-desc">${c.description}</div>` : ''}
+    </div>
+  `).join('') : `<div style="color:rgba(255,255,255,0.3);text-align:center;grid-column:1/-1;padding:3rem">No courses listed yet.</div>`;
+}
+
+// ── Blog ───────────────────────────────────────────────────────────
+async function loadPortfolioBlog() {
+  const { data } = await getArticles(true);
+  const articles = data || [];
+
+  document.getElementById('blogGrid').innerHTML = articles.length ? articles.map(a => {
+    const excerpt = (a.content || '').substring(0, 200) + ((a.content||'').length > 200 ? '...' : '');
+    return `
+    <div class="article-card">
+      <div class="article-tags">${(a.tags||[]).map(t=>`<span class="article-tag">${t}</span>`).join('')}</div>
+      <div class="article-title">${a.title}</div>
+      <div class="article-excerpt">${excerpt}</div>
+      <div class="article-meta">
+        <span>${a.published_at ? new Date(a.published_at).toLocaleDateString('en-PK',{year:'numeric',month:'long',day:'numeric'}) : ''}</span>
+      </div>
+    </div>`;
+  }).join('') : `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-3)">No articles published yet.</div>`;
+}
+
+// ── Video modal ────────────────────────────────────────────────────
+function openVideo(videoId) {
+  if (!videoId) return;
+  document.getElementById('videoFrame').src = getYouTubeEmbedUrl(videoId) + '?autoplay=1';
+  document.getElementById('videoOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeVideoModal() {
+  document.getElementById('videoFrame').src = '';
+  document.getElementById('videoOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function closeVideo(e) {
+  if (e.target === document.getElementById('videoOverlay')) closeVideoModal();
+}
+
+// ── Contact form ───────────────────────────────────────────────────
+async function submitContactForm() {
+  const name = document.getElementById('cfName').value.trim();
+  const email = document.getElementById('cfEmail').value.trim();
+  const message = document.getElementById('cfMessage').value.trim();
+  const statusEl = document.getElementById('contactFormStatus');
+
+  if (!name || !email || !message) {
+    statusEl.style.display = 'block';
+    statusEl.style.background = 'rgba(192,57,43,0.08)';
+    statusEl.style.color = '#c0392b';
+    statusEl.textContent = 'Please fill in all fields.';
+    return;
+  }
+
+  // Save to Supabase contact_messages table
+  const { error } = await supabase.from('contact_messages').insert({ name, email, message });
+
+  statusEl.style.display = 'block';
+  if (error) {
+    statusEl.style.background = 'rgba(192,57,43,0.08)';
+    statusEl.style.color = '#c0392b';
+    statusEl.textContent = 'Failed to send. Please email directly.';
+  } else {
+    statusEl.style.background = 'rgba(26,127,75,0.08)';
+    statusEl.style.color = '#1a7f4b';
+    statusEl.textContent = 'Message sent successfully! You will receive a reply soon.';
+    document.getElementById('cfName').value = '';
+    document.getElementById('cfEmail').value = '';
+    document.getElementById('cfMessage').value = '';
+  }
+}
+
+// ── Language toggle ────────────────────────────────────────────────
+async function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.nav-lang button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  if (lang === 'ur') {
+    const { data } = await getProfile();
+    if (data) {
+      if (data.name_ur) {
+        document.getElementById('heroName').innerHTML = `<em>${data.name_ur}</em>`;
+        document.getElementById('navBrand').textContent = data.name_ur;
+      }
+      if (data.bio_ur) {
+        document.getElementById('heroBio').textContent = data.bio_ur;
+        document.getElementById('aboutBioFull').textContent = data.bio_ur;
+        document.getElementById('heroBio').classList.add('urdu');
+        document.getElementById('aboutBioFull').classList.add('urdu');
+      }
+    }
+  } else {
+    // Reload English
+    loadPortfolioProfile();
+    document.getElementById('heroBio').classList.remove('urdu');
+    document.getElementById('aboutBioFull').classList.remove('urdu');
+  }
+}
+
+// ── Scroll animations ──────────────────────────────────────────────
+function initScrollAnimations() {
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.fade-up').forEach((el, i) => {
+    el.style.transitionDelay = (i % 3) * 0.08 + 's';
+    observer.observe(el);
+  });
+}
+
+</script>
+</body>
+</html>

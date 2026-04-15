@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Professor Portal</title>
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+</head>
+<body>
+<div class="app-shell" id="appShell" style="display:none">
+
+  <!-- ── SIDEBAR ───────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon" id="sidebarInitial">P</div>
+      <div class="brand-name">Prof. Portal</div>
+      <div class="brand-sub">Academic Management</div>
+    </div>
+
+    <nav class="nav-group">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="switchPage('dashboard', this)">
+        <span class="nav-icon">⊞</span> Dashboard
+      </div>
+      <div class="nav-item" onclick="switchPage('profile', this)">
+        <span class="nav-icon">◎</span> My Profile
+      </div>
+    </nav>
+
+    <nav class="nav-group">
+      <div class="nav-label">Content</div>
+      <div class="nav-item" onclick="switchPage('lectures', this)">
+        <span class="nav-icon">▶</span> Lectures
+      </div>
+      <div class="nav-item" onclick="switchPage('publications', this)">
+        <span class="nav-icon">📄</span> Publications
+      </div>
+      <div class="nav-item" onclick="switchPage('courses', this)">
+        <span class="nav-icon">📚</span> Courses
+      </div>
+      <div class="nav-item" onclick="switchPage('blog', this)">
+        <span class="nav-icon">✏</span> Blog / Articles
+      </div>
+    </nav>
+
+    <nav class="nav-group">
+      <div class="nav-label">Settings</div>
+      <div class="nav-item" onclick="switchPage('cv', this)">
+        <span class="nav-icon">📋</span> CV / Resume
+      </div>
+      <div class="nav-item" onclick="switchPage('contact', this)">
+        <span class="nav-icon">✉</span> Contact Info
+      </div>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="prof-chip">
+        <div class="prof-avatar" id="sidebarAvatar">P</div>
+        <div class="prof-info">
+          <div class="prof-name" id="sidebarName">Professor</div>
+          <div class="prof-role">Admin</div>
+        </div>
+        <button class="btn-signout" title="Sign out" onclick="signOut()">⏻</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ──────────────────────────────────────────────── -->
+  <div class="main-area">
+
+    <!-- Dashboard Page -->
+    <div id="page-dashboard" class="page-view">
+      <div class="topbar">
+        <div class="topbar-left">
+          <span class="topbar-title" id="dashGreeting">Good morning</span>
+        </div>
+        <div class="topbar-right">
+          <a href="../portfolio/index.html" target="_blank" class="btn btn-outline btn-sm">
+            🔗 View Portfolio
+          </a>
+          <div class="lang-toggle">
+            <button class="lang-btn active" onclick="setLang('en', this)">EN</button>
+            <button class="lang-btn" onclick="setLang('ur', this)">اردو</button>
+          </div>
+        </div>
+      </div>
+      <div class="page-content">
+        <!-- Portfolio Banner -->
+        <div class="portfolio-banner">
+          <div class="portfolio-banner-text">
+            <div class="title">Your Public Portfolio</div>
+            <div class="sub">Share this link with students and collaborators</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="portfolio-link-box" id="portfolioLinkBox">
+              Loading...
+            </div>
+            <button class="btn btn-gold btn-sm" onclick="copyPortfolioLink()">Copy</button>
+          </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+          <div class="stat-card"><div class="skeleton" style="height:80px"></div></div>
+          <div class="stat-card"><div class="skeleton" style="height:80px"></div></div>
+          <div class="stat-card"><div class="skeleton" style="height:80px"></div></div>
+          <div class="stat-card"><div class="skeleton" style="height:80px"></div></div>
+        </div>
+
+        <!-- Recent Lectures -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Lectures</div>
+              <div class="card-sub">Latest uploaded lecture videos</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="switchPage('lectures', null)">View all</button>
+          </div>
+          <table class="data-table" id="recentLecturesTable">
+            <thead><tr><th>Title</th><th>Category</th><th>Date</th></tr></thead>
+            <tbody id="recentLecturesTbody">
+              <tr><td colspan="3"><div class="skeleton" style="height:36px;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Recent Publications -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Recent Publications</div>
+              <div class="card-sub">Latest research work</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="switchPage('publications', null)">View all</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Journal</th><th>Year</th><th>Status</th></tr></thead>
+            <tbody id="recentPubsTbody">
+              <tr><td colspan="4"><div class="skeleton" style="height:36px;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div id="page-profile" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">My Profile</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="saveProfile()">Save changes</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div style="display:grid;grid-template-columns:200px 1fr;gap:1.5rem;align-items:start">
+          <!-- Photo -->
+          <div class="card" style="text-align:center;padding:2rem 1.5rem">
+            <div class="photo-upload-box" style="margin:0 auto 1rem">
+              <div class="avatar-preview" id="profileAvatarPreview">P</div>
+              <div class="photo-upload-overlay" onclick="document.getElementById('photoInput').click()">📷</div>
+            </div>
+            <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)" />
+            <button class="btn btn-outline btn-sm" style="width:100%" onclick="document.getElementById('photoInput').click()">Change photo</button>
+            <div class="form-hint" style="margin-top:8px">JPG or PNG, max 2MB</div>
+          </div>
+
+          <!-- Form -->
+          <div class="card">
+            <div class="card-header"><div class="card-title">Academic Information</div></div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Full Name (English)</label>
+                  <input type="text" id="profileName" class="form-control" placeholder="Dr. Full Name" />
+                </div>
+                <div class="form-group">
+                  <label>Full Name (Urdu)</label>
+                  <input type="text" id="profileNameUr" class="form-control" placeholder="ڈاکٹر نام" dir="rtl" />
+                </div>
+                <div class="form-group">
+                  <label>Academic Title</label>
+                  <input type="text" id="profileTitle" class="form-control" placeholder="Associate Professor" />
+                </div>
+                <div class="form-group">
+                  <label>Department</label>
+                  <input type="text" id="profileDept" class="form-control" placeholder="Computer Science" />
+                </div>
+                <div class="form-group form-full">
+                  <label>University</label>
+                  <input type="text" id="profileUniv" class="form-control" placeholder="University of Engineering & Technology" />
+                </div>
+                <div class="form-group form-full">
+                  <label>Short Bio (English)</label>
+                  <textarea id="profileBio" class="form-control" rows="4" placeholder="Brief introduction about yourself..."></textarea>
+                </div>
+                <div class="form-group form-full">
+                  <label>Short Bio (Urdu)</label>
+                  <textarea id="profileBioUr" class="form-control" rows="4" placeholder="اپنے بارے میں مختصر تعارف..." dir="rtl"></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Research Interests</label>
+                  <input type="text" id="profileResearch" class="form-control" placeholder="ML, Data Science, NLP (comma separated)" />
+                </div>
+                <div class="form-group">
+                  <label>Years of Experience</label>
+                  <input type="number" id="profileExp" class="form-control" placeholder="10" />
+                </div>
+              </div>
+              <div class="divider"></div>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="profileEmail" class="form-control" placeholder="dr.name@university.edu" />
+                </div>
+                <div class="form-group">
+                  <label>Phone</label>
+                  <input type="tel" id="profilePhone" class="form-control" placeholder="+92-51-XXXXXXX" />
+                </div>
+                <div class="form-group">
+                  <label>Office</label>
+                  <input type="text" id="profileOffice" class="form-control" placeholder="Room 214, CS Block" />
+                </div>
+                <div class="form-group">
+                  <label>Office Hours</label>
+                  <input type="text" id="profileOfficeHours" class="form-control" placeholder="Mon–Wed 2pm–4pm" />
+                </div>
+                <div class="form-group">
+                  <label>Google Scholar URL</label>
+                  <input type="url" id="profileScholar" class="form-control" placeholder="https://scholar.google.com/..." />
+                </div>
+                <div class="form-group">
+                  <label>LinkedIn URL</label>
+                  <input type="url" id="profileLinkedin" class="form-control" placeholder="https://linkedin.com/in/..." />
+                </div>
+                <div class="form-group">
+                  <label>ResearchGate URL</label>
+                  <input type="url" id="profileResearchgate" class="form-control" placeholder="https://researchgate.net/..." />
+                </div>
+                <div class="form-group">
+                  <label>University Profile URL</label>
+                  <input type="url" id="profileUnivUrl" class="form-control" placeholder="https://university.edu/faculty/..." />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lectures Page -->
+    <div id="page-lectures" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">Lectures</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="openModal('lectureModal')">+ Add Lecture</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="tab-bar" id="lectureCategoryTabs">
+          <button class="tab-btn active" onclick="filterLectures('all', this)">All</button>
+        </div>
+        <div class="video-grid" id="lecturesGrid">
+          <div style="grid-column:1/-1" class="empty-state">
+            <div class="spinner" style="margin:0 auto 12px"></div>
+            <div>Loading lectures...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Publications Page -->
+    <div id="page-publications" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">Publications</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="openModal('pubModal')">+ Add Publication</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Research Publications</div>
+            <div class="card-sub" id="pubCount">Loading...</div>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Journal / Venue</th><th>Year</th><th>Type</th><th>Status</th><th></th></tr></thead>
+            <tbody id="pubsTbody">
+              <tr><td colspan="6"><div class="skeleton" style="height:40px;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Courses Page -->
+    <div id="page-courses" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">Courses</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="openModal('courseModal')">+ Add Course</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Current & Past Courses</div></div>
+          <table class="data-table">
+            <thead><tr><th>Code</th><th>Title</th><th>Semester</th><th>Description</th><th></th></tr></thead>
+            <tbody id="coursesTbody">
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Blog Page -->
+    <div id="page-blog" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">Blog / Articles</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="openModal('articleModal')">+ Write Article</button>
+        </div>
+      </div>
+      <div class="page-content">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Articles & Posts</div></div>
+          <table class="data-table">
+            <thead><tr><th>Title</th><th>Tags</th><th>Published</th><th>Status</th><th></th></tr></thead>
+            <tbody id="articlesTbody">
+              <tr><td colspan="5"><div class="skeleton" style="height:40px;margin:8px 0"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CV Page -->
+    <div id="page-cv" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">CV / Resume</span></div>
+      </div>
+      <div class="page-content">
+        <div class="card" style="max-width:600px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Curriculum Vitae</div>
+              <div class="card-sub">PDF available for public download on portfolio</div>
+            </div>
+          </div>
+          <div class="card-body" id="cvCardBody">
+            <div id="cvCurrentFile" style="display:flex;align-items:center;gap:1rem;padding:1rem;background:var(--ivory);border-radius:var(--radius-md);margin-bottom:1.25rem;display:none">
+              <div style="width:52px;height:64px;background:rgba(192,57,43,0.08);border:1px solid rgba(192,57,43,0.2);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--danger)">PDF</div>
+              <div>
+                <div id="cvFileName" style="font-size:14px;font-weight:500;color:var(--text-primary)">—</div>
+                <div id="cvFileDate" style="font-size:12px;color:var(--text-muted);margin-top:2px">—</div>
+              </div>
+              <a id="cvDownloadLink" href="#" target="_blank" class="btn btn-outline btn-sm" style="margin-left:auto">Download</a>
+            </div>
+            <div style="border:2px dashed var(--border);border-radius:var(--radius-lg);padding:2.5rem;text-align:center;cursor:pointer" onclick="document.getElementById('cvFileInput').click()">
+              <div style="font-size:32px;margin-bottom:8px">📄</div>
+              <div style="font-size:14px;font-weight:500;color:var(--text-primary);margin-bottom:4px">Upload CV / Resume</div>
+              <div style="font-size:12px;color:var(--text-muted)">PDF only, max 10MB</div>
+              <input type="file" id="cvFileInput" accept=".pdf" style="display:none" onchange="uploadCV(this)" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="page-contact" class="page-view" style="display:none">
+      <div class="topbar">
+        <div class="topbar-left"><span class="topbar-title">Contact Info</span></div>
+        <div class="topbar-right">
+          <button class="btn btn-gold" onclick="saveContact()">Save changes</button>
+        </div>
+      </div>
+      <div class="page-content" style="max-width:700px">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Public Contact Details</div></div>
+          <div class="card-body">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="contactEmail" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="contactPhone" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Office Address</label>
+                <input type="text" id="contactOffice" class="form-control" />
+              </div>
+              <div class="form-group">
+                <label>Office Hours</label>
+                <input type="text" id="contactHours" class="form-control" />
+              </div>
+              <div class="form-group form-full">
+                <label>Google Scholar URL</label>
+                <input type="url" id="contactScholar" class="form-control" />
+              </div>
+              <div class="form-group form-full">
+                <label>LinkedIn URL</label>
+                <input type="url" id="contactLinkedin" class="form-control" />
+              </div>
+              <div class="form-group form-full">
+                <label>ResearchGate URL</label>
+                <input type="url" id="contactResearchgate" class="form-control" />
+              </div>
+              <div class="form-group form-full">
+                <label>University Profile URL</label>
+                <input type="url" id="contactUnivUrl" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-area -->
+</div><!-- /app-shell -->
+
+<!-- ============================================================
+     MODALS
+     ============================================================ -->
+
+<!-- Lecture Modal -->
+<div class="modal-overlay" id="lectureModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="lectureModeTitle">Add Lecture</span>
+      <button class="modal-close" onclick="closeModal('lectureModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="lectureId" />
+      <div class="form-group">
+        <label>YouTube URL</label>
+        <input type="url" id="lectureUrl" class="form-control" placeholder="https://youtube.com/watch?v=..." oninput="previewYouTube(this.value)" />
+      </div>
+      <div id="ytPreview" style="display:none;margin-bottom:1rem;border-radius:var(--radius-md);overflow:hidden;aspect-ratio:16/9;background:var(--navy)">
+        <img id="ytThumb" src="" style="width:100%;height:100%;object-fit:cover;opacity:0.85" />
+      </div>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="lectureTitle" class="form-control" placeholder="Lecture title" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Category / Course</label>
+          <input type="text" id="lectureCategory" class="form-control" placeholder="e.g. Data Structures" />
+        </div>
+        <div class="form-group">
+          <label>Lecture Number</label>
+          <input type="text" id="lectureNumber" class="form-control" placeholder="e.g. Lecture 01" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="lectureDesc" class="form-control" rows="3" placeholder="Brief description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('lectureModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveLecture()">Save Lecture</button>
+    </div>
+  </div>
+</div>
+
+<!-- Publication Modal -->
+<div class="modal-overlay" id="pubModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="pubModeTitle">Add Publication</span>
+      <button class="modal-close" onclick="closeModal('pubModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pubId" />
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="pubTitle" class="form-control" placeholder="Full publication title" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Journal / Conference</label>
+          <input type="text" id="pubJournal" class="form-control" placeholder="Journal name" />
+        </div>
+        <div class="form-group">
+          <label>Year</label>
+          <input type="number" id="pubYear" class="form-control" placeholder="2024" min="1990" max="2030" />
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select id="pubType" class="form-control">
+            <option value="journal">Journal Article</option>
+            <option value="conference">Conference Paper</option>
+            <option value="book">Book / Book Chapter</option>
+            <option value="thesis">Thesis</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="pubStatus" class="form-control">
+            <option value="published">Published</option>
+            <option value="accepted">Accepted</option>
+            <option value="under_review">Under Review</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>DOI / URL (optional)</label>
+        <input type="url" id="pubDoi" class="form-control" placeholder="https://doi.org/..." />
+      </div>
+      <div class="form-group">
+        <label>Abstract (optional)</label>
+        <textarea id="pubAbstract" class="form-control" rows="3" placeholder="Brief abstract..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('pubModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="savePublication()">Save Publication</button>
+    </div>
+  </div>
+</div>
+
+<!-- Course Modal -->
+<div class="modal-overlay" id="courseModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="courseModeTitle">Add Course</span>
+      <button class="modal-close" onclick="closeModal('courseModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="courseId" />
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Course Code</label>
+          <input type="text" id="courseCode" class="form-control" placeholder="CS301" />
+        </div>
+        <div class="form-group">
+          <label>Semester</label>
+          <input type="text" id="courseSemester" class="form-control" placeholder="Spring 2025" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Course Title</label>
+        <input type="text" id="courseTitle" class="form-control" placeholder="Data Structures & Algorithms" />
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="courseDesc" class="form-control" rows="3" placeholder="Course description..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('courseModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveCourse()">Save Course</button>
+    </div>
+  </div>
+</div>
+
+<!-- Article Modal -->
+<div class="modal-overlay" id="articleModal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <span class="modal-title" id="articleModeTitle">Write Article</span>
+      <button class="modal-close" onclick="closeModal('articleModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="articleId" />
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="articleTitle" class="form-control" placeholder="Article title" />
+      </div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Tags (comma separated)</label>
+          <input type="text" id="articleTags" class="form-control" placeholder="ml, python, teaching" />
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="articleStatus" class="form-control">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Content</label>
+        <textarea id="articleContent" class="form-control" rows="10" placeholder="Write your article here..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('articleModal')">Cancel</button>
+      <button class="btn btn-gold" onclick="saveArticle()">Save Article</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- Loading screen -->
+<div id="loadingScreen" style="position:fixed;inset:0;background:var(--ivory);display:flex;align-items:center;justify-content:center;z-index:9999">
+  <div style="text-align:center">
+    <div style="width:48px;height:48px;background:linear-gradient(135deg,var(--gold),var(--gold-light));border-radius:var(--radius-lg);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:24px;font-weight:600;color:var(--navy);margin:0 auto 16px">P</div>
+    <div class="spinner" style="margin:0 auto"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script>
+
+// ── State ──────────────────────────────────────────────────────
+let profileData = null;
+let lecturesData = [];
+let pubsData = [];
+let coursesData = [];
+let articlesData = [];
+let currentLectureFilter = 'all';
+
+// ── Init ────────────────────────────────────────────────────────
+(async () => {
+  initSupabase();
+  const session = await requireAuth();
+  if (!session) return;
+
+  // Greet
+  const hr = new Date().getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dashGreeting').textContent = greet;
+
+  // Portfolio link
+  document.getElementById('portfolioLinkBox').textContent = window.location.origin + '/portfolio/';
+
+  await loadAll();
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('appShell').style.display = 'flex';
+})();
+
+async function loadAll() {
+  await loadProfile();
+  await loadDashboardStats();
+  await loadRecentLectures();
+  await loadRecentPubs();
+}
+
+// ── Profile ─────────────────────────────────────────────────────
+async function loadProfile() {
+  const { data } = await getProfile();
+  if (!data) return;
+  profileData = data;
+
+  // Sidebar
+  const initials = data.name ? data.name.split(' ').map(w => w[0]).join('').substring(0,2).toUpperCase() : 'P';
+  document.getElementById('sidebarInitial').textContent = initials;
+  document.getElementById('sidebarName').textContent = data.name || 'Professor';
+  if (data.photo_url) {
+    document.getElementById('sidebarAvatar').innerHTML = `<img src="${data.photo_url}" />`;
+  } else {
+    document.getElementById('sidebarAvatar').textContent = initials;
+  }
+
+  // Profile form
+  if (document.getElementById('profileName')) {
+    setFieldValue('profileName', data.name);
+    setFieldValue('profileNameUr', data.name_ur);
+    setFieldValue('profileTitle', data.title);
+    setFieldValue('profileDept', data.department);
+    setFieldValue('profileUniv', data.university);
+    setFieldValue('profileBio', data.bio);
+    setFieldValue('profileBioUr', data.bio_ur);
+    setFieldValue('profileResearch', data.research_interests);
+    setFieldValue('profileExp', data.years_experience);
+    setFieldValue('profileEmail', data.email);
+    setFieldValue('profilePhone', data.phone);
+    setFieldValue('profileOffice', data.office);
+    setFieldValue('profileOfficeHours', data.office_hours);
+    setFieldValue('profileScholar', data.scholar_url);
+    setFieldValue('profileLinkedin', data.linkedin_url);
+    setFieldValue('profileResearchgate', data.researchgate_url);
+    setFieldValue('profileUnivUrl', data.univ_profile_url);
+
+    // Update avatar preview
+    const avatarEl = document.getElementById('profileAvatarPreview');
+    if (data.photo_url) {
+      avatarEl.innerHTML = `<img src="${data.photo_url}" style="width:100%;height:100%;object-fit:cover" />`;
+    } else {
+      avatarEl.textContent = initials;
+    }
+
+    // Sync to contact tab
+    setFieldValue('contactEmail', data.email);
+    setFieldValue('contactPhone', data.phone);
+    setFieldValue('contactOffice', data.office);
+    setFieldValue('contactHours', data.office_hours);
+    setFieldValue('contactScholar', data.scholar_url);
+    setFieldValue('contactLinkedin', data.linkedin_url);
+    setFieldValue('contactResearchgate', data.researchgate_url);
+    setFieldValue('contactUnivUrl', data.univ_profile_url);
+  }
+}
+
+async function saveProfile() {
+  const payload = {
+    name: val('profileName'),
+    name_ur: val('profileNameUr'),
+    title: val('profileTitle'),
+    department: val('profileDept'),
+    university: val('profileUniv'),
+    bio: val('profileBio'),
+    bio_ur: val('profileBioUr'),
+    research_interests: val('profileResearch'),
+    years_experience: parseInt(val('profileExp')) || null,
+    email: val('profileEmail'),
+    phone: val('profilePhone'),
+    office: val('profileOffice'),
+    office_hours: val('profileOfficeHours'),
+    scholar_url: val('profileScholar'),
+    linkedin_url: val('profileLinkedin'),
+    researchgate_url: val('profileResearchgate'),
+    univ_profile_url: val('profileUnivUrl'),
+  };
+
+  // Upload photo if selected
+  const photoInput = document.getElementById('photoInput');
+  if (photoInput.files[0]) {
+    const file = photoInput.files[0];
+    const ext = file.name.split('.').pop();
+    const { data: uploadData, error: uploadErr } = await uploadFile('avatars', `profile.${ext}`, file);
+    if (!uploadErr) {
+      payload.photo_url = getPublicUrl('avatars', `profile.${ext}`);
+    }
+  }
+
+  const { error } = await upsertProfile(payload);
+  if (error) { showToast('Failed to save profile: ' + error.message, 'error'); return; }
+  showToast('Profile saved successfully!', 'success');
+  await loadProfile();
+}
+
+async function saveContact() {
+  const payload = {
+    email: val('contactEmail'),
+    phone: val('contactPhone'),
+    office: val('contactOffice'),
+    office_hours: val('contactHours'),
+    scholar_url: val('contactScholar'),
+    linkedin_url: val('contactLinkedin'),
+    researchgate_url: val('contactResearchgate'),
+    univ_profile_url: val('contactUnivUrl'),
+  };
+  const { error } = await upsertProfile(payload);
+  if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
+  showToast('Contact info saved!', 'success');
+}
+
+function previewPhoto(input) {
+  if (!input.files[0]) return;
+  const url = URL.createObjectURL(input.files[0]);
+  const el = document.getElementById('profileAvatarPreview');
+  el.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover" />`;
+}
+
+// ── Dashboard Stats ─────────────────────────────────────────────
+async function loadDashboardStats() {
+  const [{ data: lec }, { data: pub }, { data: crs }, { data: art }] = await Promise.all([
+    getLectures(), getPublications(), getCourses(), getArticles()
+  ]);
+
+  lecturesData = lec || [];
+  pubsData = pub || [];
+  coursesData = crs || [];
+  articlesData = art || [];
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-icon">▶</div><div class="stat-value">${lecturesData.length}</div><div class="stat-label">Lectures</div></div>
+    <div class="stat-card"><div class="stat-icon">📄</div><div class="stat-value">${pubsData.length}</div><div class="stat-label">Publications</div></div>
+    <div class="stat-card"><div class="stat-icon">📚</div><div class="stat-value">${coursesData.length}</div><div class="stat-label">Courses</div></div>
+    <div class="stat-card"><div class="stat-icon">✏</div><div class="stat-value">${articlesData.filter(a=>a.status==='published').length}</div><div class="stat-label">Published Articles</div></div>
+  `;
+}
+
+async function loadRecentLectures() {
+  const { data } = await getLectures();
+  lecturesData = data || [];
+  const tbody = document.getElementById('recentLecturesTbody');
+  if (!lecturesData.length) {
+    tbody.innerHTML = `<tr><td colspan="3"><div class="empty-state" style="padding:1.5rem">No lectures yet. <a href="#" onclick="switchPage('lectures',null)" style="color:var(--gold)">Add your first lecture →</a></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = lecturesData.slice(0, 5).map(l => `
+    <tr>
+      <td>${l.title}</td>
+      <td><span class="badge badge-navy">${l.category || '—'}</span></td>
+      <td>${l.created_at ? new Date(l.created_at).toLocaleDateString() : '—'}</td>
+    </tr>
+  `).join('');
+}
+
+async function loadRecentPubs() {
+  const { data } = await getPublications();
+  pubsData = data || [];
+  const tbody = document.getElementById('recentPubsTbody');
+  if (!pubsData.length) {
+    tbody.innerHTML = `<tr><td colspan="4"><div class="empty-state" style="padding:1.5rem">No publications yet.</div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = pubsData.slice(0, 5).map(p => `
+    <tr>
+      <td>${p.title}</td>
+      <td>${p.journal_name || '—'}</td>
+      <td>${p.year || '—'}</td>
+      <td>${statusBadge(p.status)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Lectures ────────────────────────────────────────────────────
+async function loadLectures() {
+  const { data } = await getLectures();
+  lecturesData = data || [];
+  renderLecturesGrid(lecturesData);
+  renderLectureTabs(lecturesData);
+}
+
+function renderLectureTabs(data) {
+  const categories = [...new Set(data.map(l => l.category).filter(Boolean))];
+  const tabs = document.getElementById('lectureCategoryTabs');
+  tabs.innerHTML = `<button class="tab-btn ${currentLectureFilter==='all'?'active':''}" onclick="filterLectures('all',this)">All (${data.length})</button>`;
+  categories.forEach(cat => {
+    const count = data.filter(l => l.category === cat).length;
+    tabs.innerHTML += `<button class="tab-btn ${currentLectureFilter===cat?'active':''}" onclick="filterLectures('${cat}',this)">${cat} (${count})</button>`;
+  });
+}
+
+function filterLectures(cat, btn) {
+  currentLectureFilter = cat;
+  document.querySelectorAll('#lectureCategoryTabs .tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const filtered = cat === 'all' ? lecturesData : lecturesData.filter(l => l.category === cat);
+  renderLecturesGrid(filtered);
+}
+
+function renderLecturesGrid(data) {
+  const grid = document.getElementById('lecturesGrid');
+  if (!data.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">▶</div><div class="empty-title">No lectures yet</div><div class="empty-sub">Add your first YouTube lecture</div></div></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(l => {
+    const vid = extractYouTubeId(l.youtube_url || '');
+    const thumb = vid ? getYouTubeThumbnail(vid) : '';
+    return `
+    <div class="video-card">
+      <div class="video-thumb">
+        ${thumb ? `<img src="${thumb}" alt="${l.title}" />` : `<div style="background:var(--navy-mid);width:100%;height:100%"></div>`}
+        <div class="video-play"><div class="video-play-btn">▶</div></div>
+      </div>
+      <div class="video-card-body">
+        <div class="video-card-title">${l.title}</div>
+        <div class="video-card-meta">
+          ${l.category ? `<span class="badge badge-navy">${l.category}</span>` : ''}
+          ${l.lecture_number ? `<span style="color:var(--text-muted)">${l.lecture_number}</span>` : ''}
+        </div>
+        ${l.description ? `<div style="font-size:11px;color:var(--text-muted);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${l.description}</div>` : ''}
+      </div>
+      <div class="video-card-actions">
+        <a href="${l.youtube_url}" target="_blank" class="btn btn-ghost btn-xs">Watch</a>
+        <button class="btn btn-ghost btn-xs" onclick="editLecture(${JSON.stringify(l).replace(/"/g,'&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmDelete('lecture','${l.id}')">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function saveLecture() {
+  const ytUrl = val('lectureUrl');
+  const vid = extractYouTubeId(ytUrl);
+  if (!vid) { showToast('Please enter a valid YouTube URL', 'error'); return; }
+
+  const payload = {
+    youtube_url: ytUrl,
+    youtube_id: vid,
+    title: val('lectureTitle'),
+    category: val('lectureCategory'),
+    lecture_number: val('lectureNumber'),
+    description: val('lectureDesc'),
+  };
+  const existingId = val('lectureId');
+  if (existingId) payload.id = existingId;
+
+  const { error } = await upsertLecture(payload);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Lecture saved!', 'success');
+  closeModal('lectureModal');
+  await loadLectures();
+}
+
+function editLecture(lec) {
+  document.getElementById('lectureModeTitle').textContent = 'Edit Lecture';
+  setFieldValue('lectureId', lec.id);
+  setFieldValue('lectureUrl', lec.youtube_url);
+  setFieldValue('lectureTitle', lec.title);
+  setFieldValue('lectureCategory', lec.category);
+  setFieldValue('lectureNumber', lec.lecture_number);
+  setFieldValue('lectureDesc', lec.description);
+  previewYouTube(lec.youtube_url);
+  openModal('lectureModal');
+}
+
+function previewYouTube(url) {
+  const vid = extractYouTubeId(url || '');
+  const previewEl = document.getElementById('ytPreview');
+  if (vid) {
+    document.getElementById('ytThumb').src = getYouTubeThumbnail(vid);
+    previewEl.style.display = 'block';
+  } else {
+    previewEl.style.display = 'none';
+  }
+}
+
+// ── Publications ─────────────────────────────────────────────────
+async function loadPublications() {
+  const { data } = await getPublications();
+  pubsData = data || [];
+  document.getElementById('pubCount').textContent = `${pubsData.length} publication${pubsData.length!==1?'s':''}`;
+  const tbody = document.getElementById('pubsTbody');
+  if (!pubsData.length) {
+    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state" style="padding:2rem"><div class="empty-icon">📄</div><div class="empty-title">No publications yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = pubsData.map(p => `
+    <tr>
+      <td>${p.doi_url ? `<a href="${p.doi_url}" target="_blank" style="color:var(--navy);text-decoration:underline">${p.title}</a>` : p.title}</td>
+      <td style="color:var(--text-secondary)">${p.journal_name || '—'}</td>
+      <td>${p.year || '—'}</td>
+      <td><span class="badge badge-navy">${(p.type||'journal').replace('_',' ')}</span></td>
+      <td>${statusBadge(p.status)}</td>
+      <td><div class="actions">
+        <button class="btn btn-ghost btn-xs" onclick="editPub(${JSON.stringify(p).replace(/"/g,'&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmDelete('pub','${p.id}')">Delete</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+async function savePublication() {
+  const payload = {
+    title: val('pubTitle'),
+    journal_name: val('pubJournal'),
+    year: parseInt(val('pubYear')) || null,
+    type: val('pubType'),
+    status: val('pubStatus'),
+    doi_url: val('pubDoi'),
+    abstract: val('pubAbstract'),
+  };
+  const existingId = val('pubId');
+  if (existingId) payload.id = existingId;
+
+  const { error } = await upsertPublication(payload);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Publication saved!', 'success');
+  closeModal('pubModal');
+  await loadPublications();
+}
+
+function editPub(pub) {
+  document.getElementById('pubModeTitle').textContent = 'Edit Publication';
+  setFieldValue('pubId', pub.id);
+  setFieldValue('pubTitle', pub.title);
+  setFieldValue('pubJournal', pub.journal_name);
+  setFieldValue('pubYear', pub.year);
+  setFieldValue('pubType', pub.type);
+  setFieldValue('pubStatus', pub.status);
+  setFieldValue('pubDoi', pub.doi_url);
+  setFieldValue('pubAbstract', pub.abstract);
+  openModal('pubModal');
+}
+
+// ── Courses ─────────────────────────────────────────────────────
+async function loadCourses() {
+  const { data } = await getCourses();
+  coursesData = data || [];
+  const tbody = document.getElementById('coursesTbody');
+  if (!coursesData.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:2rem"><div class="empty-icon">📚</div><div class="empty-title">No courses yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = coursesData.map(c => `
+    <tr>
+      <td><span class="badge badge-info">${c.course_code || '—'}</span></td>
+      <td style="font-weight:500">${c.course_title}</td>
+      <td style="color:var(--text-secondary)">${c.semester || '—'}</td>
+      <td style="color:var(--text-muted);font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${c.description || '—'}</td>
+      <td><div class="actions">
+        <button class="btn btn-ghost btn-xs" onclick="editCourse(${JSON.stringify(c).replace(/"/g,'&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmDelete('course','${c.id}')">Delete</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+async function saveCourse() {
+  const payload = {
+    course_code: val('courseCode'),
+    course_title: val('courseTitle'),
+    semester: val('courseSemester'),
+    description: val('courseDesc'),
+  };
+  const existingId = val('courseId');
+  if (existingId) payload.id = existingId;
+
+  const { error } = await upsertCourse(payload);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Course saved!', 'success');
+  closeModal('courseModal');
+  await loadCourses();
+}
+
+function editCourse(course) {
+  document.getElementById('courseModeTitle').textContent = 'Edit Course';
+  setFieldValue('courseId', course.id);
+  setFieldValue('courseCode', course.course_code);
+  setFieldValue('courseTitle', course.course_title);
+  setFieldValue('courseSemester', course.semester);
+  setFieldValue('courseDesc', course.description);
+  openModal('courseModal');
+}
+
+// ── Articles ─────────────────────────────────────────────────────
+async function loadArticles() {
+  const { data } = await getArticles();
+  articlesData = data || [];
+  const tbody = document.getElementById('articlesTbody');
+  if (!articlesData.length) {
+    tbody.innerHTML = `<tr><td colspan="5"><div class="empty-state" style="padding:2rem"><div class="empty-icon">✏</div><div class="empty-title">No articles yet</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML = articlesData.map(a => `
+    <tr>
+      <td style="font-weight:500">${a.title}</td>
+      <td style="color:var(--text-muted);font-size:12px">${(a.tags||[]).join(', ') || '—'}</td>
+      <td style="color:var(--text-secondary)">${a.published_at ? new Date(a.published_at).toLocaleDateString('en-PK',{day:'numeric',month:'short'}) : '—'}</td>
+      <td>${statusBadge(a.status)}</td>
+      <td><div class="actions">
+        <button class="btn btn-ghost btn-xs" onclick="editArticle(${JSON.stringify(a).replace(/"/g,'&quot;')})">Edit</button>
+        <button class="btn btn-danger btn-xs" onclick="confirmDelete('article','${a.id}')">Delete</button>
+      </div></td>
+    </tr>
+  `).join('');
+}
+
+async function saveArticle() {
+  const status = val('articleStatus');
+  const payload = {
+    title: val('articleTitle'),
+    tags: val('articleTags').split(',').map(t=>t.trim()).filter(Boolean),
+    content: val('articleContent'),
+    status,
+    published_at: status === 'published' ? new Date().toISOString() : null,
+  };
+  const existingId = val('articleId');
+  if (existingId) payload.id = existingId;
+
+  const { error } = await upsertArticle(payload);
+  if (error) { showToast('Error: ' + error.message, 'error'); return; }
+  showToast('Article saved!', 'success');
+  closeModal('articleModal');
+  await loadArticles();
+}
+
+function editArticle(article) {
+  document.getElementById('articleModeTitle').textContent = 'Edit Article';
+  setFieldValue('articleId', article.id);
+  setFieldValue('articleTitle', article.title);
+  setFieldValue('articleTags', (article.tags||[]).join(', '));
+  setFieldValue('articleStatus', article.status);
+  setFieldValue('articleContent', article.content);
+  openModal('articleModal');
+}
+
+// ── CV ───────────────────────────────────────────────────────────
+async function uploadCV(input) {
+  if (!input.files[0]) return;
+  const file = input.files[0];
+  showToast('Uploading CV...', 'info');
+  const { error } = await uploadFile('cv', 'professor_cv.pdf', file);
+  if (error) { showToast('Upload failed: ' + error.message, 'error'); return; }
+  const url = getPublicUrl('cv', 'professor_cv.pdf');
+  await upsertProfile({ cv_url: url, cv_updated: new Date().toISOString() });
+
+  document.getElementById('cvCurrentFile').style.display = 'flex';
+  document.getElementById('cvFileName').textContent = file.name;
+  document.getElementById('cvFileDate').textContent = 'Updated: ' + new Date().toLocaleDateString();
+  document.getElementById('cvDownloadLink').href = url;
+  showToast('CV uploaded successfully!', 'success');
+}
+
+// ── Delete helpers ───────────────────────────────────────────────
+async function confirmDelete(type, id) {
+  if (!confirm('Are you sure you want to delete this item?')) return;
+  let error;
+  if (type === 'lecture') ({ error } = await deleteLecture(id));
+  else if (type === 'pub') ({ error } = await deletePublication(id));
+  else if (type === 'course') ({ error } = await deleteCourse(id));
+  else if (type === 'article') ({ error } = await deleteArticle(id));
+
+  if (error) { showToast('Delete failed: ' + error.message, 'error'); return; }
+  showToast('Deleted successfully', 'success');
+  if (type === 'lecture') loadLectures();
+  else if (type === 'pub') loadPublications();
+  else if (type === 'course') loadCourses();
+  else if (type === 'article') loadArticles();
+}
+
+// ── Navigation ────────────────────────────────────────────────────
+function switchPage(page, el) {
+  document.querySelectorAll('.page-view').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + page).style.display = 'flex';
+  document.getElementById('page-' + page).style.flexDirection = 'column';
+  document.getElementById('page-' + page).style.height = '100%';
+
+  if (el) {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // Lazy load data
+  if (page === 'lectures') loadLectures();
+  else if (page === 'publications') loadPublications();
+  else if (page === 'courses') loadCourses();
+  else if (page === 'blog') loadArticles();
+  else if (page === 'profile') loadProfile();
+}
+
+// ── Language ──────────────────────────────────────────────────────
+function setLang(lang, btn) {
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  // Store preference
+  localStorage.setItem('prof_lang', lang);
+}
+
+// ── Portfolio link ─────────────────────────────────────────────────
+function copyPortfolioLink() {
+  const link = window.location.origin + '/portfolio/';
+  navigator.clipboard.writeText(link).then(() => showToast('Link copied!', 'success'));
+}
+
+// ── Modal helpers ─────────────────────────────────────────────────
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  // Reset lecture modal
+  if (id === 'lectureModal') {
+    setFieldValue('lectureId', '');
+    setFieldValue('lectureUrl', '');
+    setFieldValue('lectureTitle', '');
+    setFieldValue('lectureCategory', '');
+    setFieldValue('lectureNumber', '');
+    setFieldValue('lectureDesc', '');
+    document.getElementById('ytPreview').style.display = 'none';
+    document.getElementById('lectureModeTitle').textContent = 'Add Lecture';
+  }
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) closeModal(overlay.id);
+  });
+});
+
+// ── Toast ─────────────────────────────────────────────────────────
+function showToast(msg, type = 'default') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span> ${msg}`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────
+function val(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function setFieldValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || '';
+}
+
+function statusBadge(status) {
+  const map = {
+    published: 'badge-success',
+    draft: 'badge-warning',
+    accepted: 'badge-info',
+    under_review: 'badge-warning',
+  };
+  return `<span class="badge ${map[status] || 'badge-navy'}">${(status||'—').replace('_',' ')}</span>`;
+}
+
+</script>
+</body>
+</html>
