@@ -2,7 +2,7 @@
 // SUPABASE CONFIG - Replace with your project credentials
 // ============================================================
 const SUPABASE_URL = 'https://tsosrdntzybtcijgjwlk.supabase.co';       // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z'; // your anon/public key
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRzb3NyZG50enlidGNpamdqd2xrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyNTE0ODUsImV4cCI6MjA5MTgyNzQ4NX0.0cbSY60y2tnBegl4iZeDiQJLb3fD1JQpTUJp3wWnqxs'; // your anon/public key
 
 // Global instance
 let supabase = null;
