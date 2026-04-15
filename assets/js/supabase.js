@@ -1,8 +1,8 @@
 // ============================================================
 // SUPABASE CONFIG — Replace with your project credentials
 // ============================================================
-const SUPABASE_URL = 'YOUR_SUPABASE_URL';       // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // your anon/public key
+const SUPABASE_URL = 'https://tsosrdntzybtcijgjwlk.supabase.co';       // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z'; // your anon/public key
 
 // Initialize Supabase client (loaded via CDN in HTML)
 let supabase;
