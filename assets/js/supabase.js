@@ -1,189 +1,167 @@
 // ============================================================
-// SUPABASE CONFIG — Replace with your project credentials
+// SUPABASE CONFIG - Replace with your project credentials
 // ============================================================
 const SUPABASE_URL = 'https://tsosrdntzybtcijgjwlk.supabase.co';       // e.g. https://xxxx.supabase.co
 const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z'; // your anon/public key
 
-// Initialize Supabase client (loaded via CDN in HTML)
-let supabase;
-function initSupabase() {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  return supabase;
-}
+// Global instance
+let supabase = null;
+
+/**
+ * Initialize Supabase client
+ * Explicitly attached to window for scope safety
+ */
+window.initSupabase = function() {
+  console.log('Initializing Supabase...');
+  
+  if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR_SUPABASE_URL')) {
+    console.error('Supabase URL is not configured.');
+    return null;
+  }
+  if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR_SUPABASE_ANON_KEY')) {
+    console.error('Supabase Anon Key is not configured.');
+    return null;
+  }
+
+  try {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      throw new Error('Supabase SDK (supabase-js) not found. Check CDN script tag.');
+    }
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase client initialized successfully.');
+    return supabase;
+  } catch (err) {
+    console.error('Supabase initialization failed:', err);
+    return null;
+  }
+};
 
 // ============================================================
-// AUTH HELPERS
+// AUTH HELPERS - Attached to window
 // ============================================================
-async function signIn(email, password) {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-  return { data, error };
-}
 
-async function signOut() {
-  await supabase.auth.signOut();
+window.signIn = async function(email, password) {
+  if (!supabase) {
+    return { error: { message: 'Supabase client not initialized. Check console for setup errors.' } };
+  }
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    return { data, error };
+  } catch (err) {
+    console.error('Auth request exception:', err);
+    return { error: { message: err.message || 'Authentication request failed' } };
+  }
+};
+
+window.signOut = async function() {
+  if (supabase) await supabase.auth.signOut();
   window.location.href = '/admin/login.html';
-}
+};
 
-async function getSession() {
+window.getSession = async function() {
+  if (!supabase) return null;
   const { data } = await supabase.auth.getSession();
   return data.session;
-}
+};
 
-async function requireAuth() {
-  const session = await getSession();
+window.requireAuth = async function() {
+  const session = await window.getSession();
   if (!session) {
     window.location.href = '/admin/login.html';
     return null;
   }
   return session;
-}
+};
 
 // ============================================================
-// PROFILE
+// DATA HELPERS - Attached to window
 // ============================================================
-async function getProfile() {
-  const { data, error } = await supabase
-    .from('profile')
-    .select('*')
-    .single();
-  return { data, error };
-}
 
-async function upsertProfile(profile) {
-  const { data, error } = await supabase
-    .from('profile')
-    .upsert(profile, { onConflict: 'id' })
-    .select()
-    .single();
-  return { data, error };
-}
+window.getProfile = async function() {
+  return await supabase.from('profile').select('*').single();
+};
 
-// ============================================================
-// LECTURES
-// ============================================================
-async function getLectures(filters = {}) {
+window.upsertProfile = async function(profile) {
+  return await supabase.from('profile').upsert(profile, { onConflict: 'id' }).select().single();
+};
+
+window.getLectures = async function(filters = {}) {
   let query = supabase.from('lectures').select('*').order('created_at', { ascending: false });
   if (filters.category) query = query.eq('category', filters.category);
-  const { data, error } = await query;
-  return { data, error };
-}
+  return await query;
+};
 
-async function upsertLecture(lecture) {
-  const { data, error } = await supabase
-    .from('lectures')
-    .upsert(lecture)
-    .select()
-    .single();
-  return { data, error };
-}
+window.upsertLecture = async function(lecture) {
+  return await supabase.from('lectures').upsert(lecture).select().single();
+};
 
-async function deleteLecture(id) {
-  const { error } = await supabase.from('lectures').delete().eq('id', id);
-  return { error };
-}
+window.deleteLecture = async function(id) {
+  return await supabase.from('lectures').delete().eq('id', id);
+};
 
-// ============================================================
-// PUBLICATIONS
-// ============================================================
-async function getPublications() {
-  const { data, error } = await supabase
-    .from('publications')
-    .select('*')
-    .order('year', { ascending: false });
-  return { data, error };
-}
+window.getPublications = async function() {
+  return await supabase.from('publications').select('*').order('year', { ascending: false });
+};
 
-async function upsertPublication(pub) {
-  const { data, error } = await supabase
-    .from('publications')
-    .upsert(pub)
-    .select()
-    .single();
-  return { data, error };
-}
+window.upsertPublication = async function(pub) {
+  return await supabase.from('publications').upsert(pub).select().single();
+};
 
-async function deletePublication(id) {
-  const { error } = await supabase.from('publications').delete().eq('id', id);
-  return { error };
-}
+window.deletePublication = async function(id) {
+  return await supabase.from('publications').delete().eq('id', id);
+};
 
-// ============================================================
-// COURSES
-// ============================================================
-async function getCourses() {
-  const { data, error } = await supabase
-    .from('courses')
-    .select('*')
-    .order('created_at', { ascending: false });
-  return { data, error };
-}
+window.getCourses = async function() {
+  return await supabase.from('courses').select('*').order('created_at', { ascending: false });
+};
 
-async function upsertCourse(course) {
-  const { data, error } = await supabase
-    .from('courses')
-    .upsert(course)
-    .select()
-    .single();
-  return { data, error };
-}
+window.upsertCourse = async function(course) {
+  return await supabase.from('courses').upsert(course).select().single();
+};
 
-async function deleteCourse(id) {
-  const { error } = await supabase.from('courses').delete().eq('id', id);
-  return { error };
-}
+window.deleteCourse = async function(id) {
+  return await supabase.from('courses').delete().eq('id', id);
+};
 
-// ============================================================
-// BLOG / ARTICLES
-// ============================================================
-async function getArticles(onlyPublished = false) {
+window.getArticles = async function(onlyPublished = false) {
   let query = supabase.from('articles').select('*').order('created_at', { ascending: false });
   if (onlyPublished) query = query.eq('status', 'published');
-  const { data, error } = await query;
-  return { data, error };
-}
+  return await query;
+};
 
-async function upsertArticle(article) {
-  const { data, error } = await supabase
-    .from('articles')
-    .upsert(article)
-    .select()
-    .single();
-  return { data, error };
-}
+window.upsertArticle = async function(article) {
+  return await supabase.from('articles').upsert(article).select().single();
+};
 
-async function deleteArticle(id) {
-  const { error } = await supabase.from('articles').delete().eq('id', id);
-  return { error };
-}
+window.deleteArticle = async function(id) {
+  return await supabase.from('articles').delete().eq('id', id);
+};
 
-// ============================================================
-// STORAGE HELPERS (for CV PDF & profile photo)
-// ============================================================
-async function uploadFile(bucket, path, file) {
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(path, file, { upsert: true });
-  return { data, error };
-}
+window.uploadFile = async function(bucket, path, file) {
+  return await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+};
 
-function getPublicUrl(bucket, path) {
+window.getPublicUrl = function(bucket, path) {
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
   return data.publicUrl;
-}
+};
 
 // ============================================================
-// YOUTUBE HELPERS
+// UTILITIES - Attached to window
 // ============================================================
-function extractYouTubeId(url) {
+
+window.extractYouTubeId = function(url) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length === 11) ? match[2] : null;
-}
+};
 
-function getYouTubeThumbnail(videoId) {
+window.getYouTubeThumbnail = function(videoId) {
   return `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
-}
+};
 
-function getYouTubeEmbedUrl(videoId) {
+window.getYouTubeEmbedUrl = function(videoId) {
   return `https://www.youtube.com/embed/${videoId}`;
-}
+};
+
+console.log('supabase.js helper library loaded and attached to window.');

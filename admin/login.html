@@ -98,45 +98,71 @@
     </div>
   </div>
 
+  <!-- Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="../assets/js/supabase.js"></script>
   <script>
-    initSupabase();
+    // ---- CONFIG ----
+    const SUPABASE_URL = 'https://tsosrdntzybtcijgjwlk.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z';
 
-    // Check if already logged in
+    // ---- Init client ----
+    let _sbClient = null;
+
+    function getClient() {
+      if (_sbClient) return _sbClient;
+      if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+        throw new Error('Supabase SDK not loaded from CDN. Check your internet connection.');
+      }
+      _sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      return _sbClient;
+    }
+
+    // ---- Check existing session ----
     (async () => {
-      const session = await getSession();
-      if (session) window.location.href = 'index.html';
+      try {
+        const client = getClient();
+        const { data } = await client.auth.getSession();
+        if (data.session) window.location.href = 'index.html';
+      } catch (e) {
+        console.warn('Session check skipped:', e.message);
+      }
     })();
 
+    // ---- Handle Login ----
     async function handleLogin() {
       const email = document.getElementById('emailInput').value.trim();
       const password = document.getElementById('passwordInput').value;
       const btn = document.getElementById('loginBtn');
       const errEl = document.getElementById('loginError');
 
-      if (!email || !password) return;
+      if (!email || !password) {
+        errEl.textContent = 'Please enter your email and password.';
+        errEl.style.display = 'block';
+        return;
+      }
 
       btn.disabled = true;
-      btn.innerHTML = '<div class="spinner"></div>';
+      btn.innerHTML = 'Signing in...';
       errEl.style.display = 'none';
 
       try {
-        const { data, error } = await signIn(email, password);
+        const client = getClient();
+        const { data, error } = await client.auth.signInWithPassword({ email, password });
 
         if (error) {
-          console.error('Login error:', error.message);
-          errEl.textContent = error.message || 'Incorrect email or password. Please try again.';
+          console.error('Auth error:', error);
+          errEl.textContent = error.message || 'Incorrect email or password.';
           errEl.style.display = 'block';
           btn.disabled = false;
           btn.innerHTML = 'Sign In';
           return;
         }
 
+        console.log('Login successful, redirecting...');
         window.location.href = 'index.html';
       } catch (err) {
         console.error('Login exception:', err);
-        errEl.textContent = 'Connection error. Please check your internet and try again.';
+        errEl.textContent = err.message || 'An unexpected error occurred. Please try again.';
         errEl.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = 'Sign In';
