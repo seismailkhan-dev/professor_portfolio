@@ -609,8 +609,33 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../assets/js/supabase.js"></script>
 <script>
+
+// ── Supabase Client (self-contained) ───────────────────────────
+const SUPABASE_URL = 'https://tsosrdntzybtcijgjwlk.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Helper functions
+async function getProfile() { return await _sb.from('profile').select('*').single(); }
+async function upsertProfile(p) { return await _sb.from('profile').upsert(p, { onConflict: 'id' }).select().single(); }
+async function getLectures(f={}) { let q = _sb.from('lectures').select('*').order('created_at',{ascending:false}); if(f.category) q=q.eq('category',f.category); return await q; }
+async function upsertLecture(l) { return await _sb.from('lectures').upsert(l).select().single(); }
+async function deleteLecture(id) { return await _sb.from('lectures').delete().eq('id',id); }
+async function getPublications() { return await _sb.from('publications').select('*').order('year',{ascending:false}); }
+async function upsertPublication(p) { return await _sb.from('publications').upsert(p).select().single(); }
+async function deletePublication(id) { return await _sb.from('publications').delete().eq('id',id); }
+async function getCourses() { return await _sb.from('courses').select('*').order('created_at',{ascending:false}); }
+async function upsertCourse(c) { return await _sb.from('courses').upsert(c).select().single(); }
+async function deleteCourse(id) { return await _sb.from('courses').delete().eq('id',id); }
+async function getArticles(onlyPublished=false) { let q=_sb.from('articles').select('*').order('created_at',{ascending:false}); if(onlyPublished) q=q.eq('status','published'); return await q; }
+async function upsertArticle(a) { return await _sb.from('articles').upsert(a).select().single(); }
+async function deleteArticle(id) { return await _sb.from('articles').delete().eq('id',id); }
+async function uploadFile(bucket,path,file) { return await _sb.storage.from(bucket).upload(path,file,{upsert:true}); }
+function getPublicUrl(bucket,path) { const {data}=_sb.storage.from(bucket).getPublicUrl(path); return data.publicUrl; }
+async function signOut() { await _sb.auth.signOut(); window.location.href='login.html'; }
+function extractYouTubeId(url) { const m=url.match(/^.*(youtu.be\/|v\/|embed\/|watch\?v=|&v=)([^#&?]{11})/); return m?m[2]:null; }
+function getYouTubeThumbnail(id) { return `https://img.youtube.com/vi/${id}/mqdefault.jpg`; }
 
 // ── State ──────────────────────────────────────────────────────
 let profileData = null;
@@ -622,22 +647,30 @@ let currentLectureFilter = 'all';
 
 // ── Init ────────────────────────────────────────────────────────
 (async () => {
-  initSupabase();
-  const session = await requireAuth();
-  if (!session) return;
+  try {
+    // Check auth
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'login.html';
+      return;
+    }
 
-  // Greet
-  const hr = new Date().getHours();
-  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('dashGreeting').textContent = greet;
+    // Greet
+    const hr = new Date().getHours();
+    const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('dashGreeting').textContent = greet;
 
-  // Portfolio link
-  document.getElementById('portfolioLinkBox').textContent = window.location.origin + '/portfolio/';
+    // Portfolio link
+    document.getElementById('portfolioLinkBox').textContent = window.location.origin + '/portfolio/';
 
-  await loadAll();
+    await loadAll();
 
-  document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('appShell').style.display = 'flex';
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+  } catch (err) {
+    console.error('Dashboard init error:', err);
+    document.getElementById('loadingScreen').innerHTML = `<div style="text-align:center;padding:2rem"><div style="color:#c0392b;font-size:14px;margin-top:1rem">Error loading dashboard: ${err.message}</div><br><a href="login.html">Back to login</a></div>`;
+  }
 })();
 
 async function loadAll() {
