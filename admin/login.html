@@ -121,16 +121,26 @@
       btn.innerHTML = '<div class="spinner"></div>';
       errEl.style.display = 'none';
 
-      const { data, error } = await signIn(email, password);
+      try {
+        const { data, error } = await signIn(email, password);
 
-      if (error) {
+        if (error) {
+          console.error('Login error:', error.message);
+          errEl.textContent = error.message || 'Incorrect email or password. Please try again.';
+          errEl.style.display = 'block';
+          btn.disabled = false;
+          btn.innerHTML = 'Sign In';
+          return;
+        }
+
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error('Login exception:', err);
+        errEl.textContent = 'Connection error. Please check your internet and try again.';
         errEl.style.display = 'block';
         btn.disabled = false;
         btn.innerHTML = 'Sign In';
-        return;
       }
-
-      window.location.href = 'index.html';
     }
 
     // Enter key support
