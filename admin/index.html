@@ -737,7 +737,12 @@ async function loadProfile() {
 }
 
 async function saveProfile() {
+  if (!profileData || !profileData.id) {
+    showToast('Profile not loaded yet. Please wait and try again.', 'error');
+    return;
+  }
   const payload = {
+    id: profileData.id,
     name: val('profileName'),
     name_ur: val('profileNameUr'),
     title: val('profileTitle'),
@@ -775,7 +780,12 @@ async function saveProfile() {
 }
 
 async function saveContact() {
+  if (!profileData || !profileData.id) {
+    showToast('Profile not loaded yet. Please wait and try again.', 'error');
+    return;
+  }
   const payload = {
+    id: profileData.id,
     email: val('contactEmail'),
     phone: val('contactPhone'),
     office: val('contactOffice'),
@@ -788,6 +798,7 @@ async function saveContact() {
   const { error } = await upsertProfile(payload);
   if (error) { showToast('Failed to save: ' + error.message, 'error'); return; }
   showToast('Contact info saved!', 'success');
+  await loadProfile();
 }
 
 function previewPhoto(input) {
