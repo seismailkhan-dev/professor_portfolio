@@ -203,20 +203,41 @@ let currentLang = 'en';
 // ── Init ───────────────────────────────────────────────────────────
 (async () => {
   initSupabase();
+  
+  // Get ID from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const profileId = urlParams.get('id');
+  
+  if (!profileId) {
+    document.getElementById('heroTitle').textContent = 'Profile Not Found';
+    document.getElementById('heroBio').textContent = 'Please provide a valid portfolio ID in the URL.';
+    document.getElementById('loadingScreen')?.style?.display = 'none'; // If I had one
+    return;
+  }
+
+  // Load profile first to get user_id for other data
+  const profile = await loadPortfolioProfile(profileId);
+  if (!profile) {
+    document.getElementById('heroTitle').textContent = 'Professor Not Found';
+    document.getElementById('heroBio').textContent = 'We couldn\'t find the professor you\'re looking for.';
+    return;
+  }
+
+  const userId = profile.user_id;
+
   await Promise.all([
-    loadPortfolioProfile(),
-    loadPortfolioLectures(),
-    loadPortfolioPubs(),
-    loadPortfolioCourses(),
-    loadPortfolioBlog(),
+    loadPortfolioLectures(userId),
+    loadPortfolioPubs(userId),
+    loadPortfolioCourses(userId),
+    loadPortfolioBlog(userId),
   ]);
   initScrollAnimations();
 })();
 
 // ── Profile ────────────────────────────────────────────────────────
-async function loadPortfolioProfile() {
-  const { data } = await getProfile();
-  if (!data) return;
+async function loadPortfolioProfile(id) {
+  const { data } = await getProfile(id);
+  if (!data) return null;
 
   const name = data.name || 'Professor';
   const nameUr = data.name_ur || '';
@@ -305,6 +326,8 @@ async function loadPortfolioProfile() {
       </div>
     `;
   }
+  
+  return data;
 }
 
 function contactItem(icon, label, value) {
@@ -329,8 +352,8 @@ function formatName(name) {
 }
 
 // ── Lectures ───────────────────────────────────────────────────────
-async function loadPortfolioLectures() {
-  const { data } = await getLectures();
+async function loadPortfolioLectures(userId) {
+  const { data } = await getLectures(userId);
   allLectures = data || [];
 
   document.getElementById('statLectures').textContent = allLectures.length;
@@ -379,8 +402,8 @@ function renderPortfolioLectures(data) {
 }
 
 // ── Publications ───────────────────────────────────────────────────
-async function loadPortfolioPubs() {
-  const { data } = await getPublications();
+async function loadPortfolioPubs(userId) {
+  const { data } = await getPublications(userId);
   const pubs = data || [];
   document.getElementById('statPubs').textContent = pubs.length;
 
@@ -406,8 +429,8 @@ async function loadPortfolioPubs() {
 }
 
 // ── Courses ────────────────────────────────────────────────────────
-async function loadPortfolioCourses() {
-  const { data } = await getCourses();
+async function loadPortfolioCourses(userId) {
+  const { data } = await getCourses(userId);
   const courses = data || [];
   document.getElementById('statCourses').textContent = courses.length;
 
@@ -422,8 +445,8 @@ async function loadPortfolioCourses() {
 }
 
 // ── Blog ───────────────────────────────────────────────────────────
-async function loadPortfolioBlog() {
-  const { data } = await getArticles(true);
+async function loadPortfolioBlog(userId) {
+  const { data } = await getArticles(true, userId);
   const articles = data || [];
 
   document.getElementById('blogGrid').innerHTML = articles.length ? articles.map(a => {
@@ -473,8 +496,19 @@ async function submitContactForm() {
     return;
   }
 
+  // Get user_id from the current profile
+  const urlParams = new URLSearchParams(window.location.search);
+  const profileId = urlParams.get('id');
+  const { data: prof } = await getProfile(profileId);
+  if (!prof) { showToast('Error: Professor not found', 'error'); return; }
+
   // Save to Supabase contact_messages table
-  const { error } = await supabase.from('contact_messages').insert({ name, email, message });
+  const { error } = await supabase.from('contact_messages').insert({ 
+    user_id: prof.user_id, 
+    name, 
+    email, 
+    message 
+  });
 
   statusEl.style.display = 'block';
   if (error) {

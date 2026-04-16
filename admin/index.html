@@ -618,22 +618,65 @@ const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper functions
 async function getProfile() {
-  const { data, error } = await _sb.from('profile').select('*').order('created_at', { ascending: true }).limit(1);
+  const { data: { user } } = await _sb.auth.getUser();
+  if (!user) return { data: null, error: 'Not authenticated' };
+  
+  const { data, error } = await _sb.from('profile').select('*').eq('user_id', user.id).limit(1);
   if (error) return { data: null, error };
   return { data: data && data.length > 0 ? data[0] : null, error: null };
 }
+async function createDefaultProfile() {
+  const { data: { user } } = await _sb.auth.getUser();
+  const payload = {
+    user_id: user.id,
+    name: 'Dr. New Professor',
+    title: 'Assistant Professor',
+    department: 'Your Department',
+    university: 'Your University',
+    bio: 'Welcome! Please update your profile information.'
+  };
+  return await _sb.from('profile').insert(payload).select().single();
+}
 async function upsertProfile(p) { return await _sb.from('profile').upsert(p, { onConflict: 'id' }).select().single(); }
-async function getLectures(f={}) { let q = _sb.from('lectures').select('*').order('created_at',{ascending:false}); if(f.category) q=q.eq('category',f.category); return await q; }
-async function upsertLecture(l) { return await _sb.from('lectures').upsert(l).select().single(); }
+async function getLectures(f={}) { 
+  if (!profileData) return { data: [] };
+  let q = _sb.from('lectures').select('*').eq('user_id', profileData.user_id).order('created_at',{ascending:false}); 
+  if(f.category) q=q.eq('category',f.category); 
+  return await q; 
+}
+async function upsertLecture(l) { 
+  if (profileData) l.user_id = profileData.user_id;
+  return await _sb.from('lectures').upsert(l).select().single(); 
+}
 async function deleteLecture(id) { return await _sb.from('lectures').delete().eq('id',id); }
-async function getPublications() { return await _sb.from('publications').select('*').order('year',{ascending:false}); }
-async function upsertPublication(p) { return await _sb.from('publications').upsert(p).select().single(); }
+async function getPublications() { 
+  if (!profileData) return { data: [] };
+  return await _sb.from('publications').select('*').eq('user_id', profileData.user_id).order('year',{ascending:false}); 
+}
+async function upsertPublication(p) { 
+  if (profileData) p.user_id = profileData.user_id;
+  return await _sb.from('publications').upsert(p).select().single(); 
+}
 async function deletePublication(id) { return await _sb.from('publications').delete().eq('id',id); }
-async function getCourses() { return await _sb.from('courses').select('*').order('created_at',{ascending:false}); }
-async function upsertCourse(c) { return await _sb.from('courses').upsert(c).select().single(); }
+async function getCourses() { 
+  if (!profileData) return { data: [] };
+  return await _sb.from('courses').select('*').eq('user_id', profileData.user_id).order('created_at',{ascending:false}); 
+}
+async function upsertCourse(c) { 
+  if (profileData) c.user_id = profileData.user_id;
+  return await _sb.from('courses').upsert(c).select().single(); 
+}
 async function deleteCourse(id) { return await _sb.from('courses').delete().eq('id',id); }
-async function getArticles(onlyPublished=false) { let q=_sb.from('articles').select('*').order('created_at',{ascending:false}); if(onlyPublished) q=q.eq('status','published'); return await q; }
-async function upsertArticle(a) { return await _sb.from('articles').upsert(a).select().single(); }
+async function getArticles(onlyPublished=false) { 
+  if (!profileData) return { data: [] };
+  let q=_sb.from('articles').select('*').eq('user_id', profileData.user_id).order('created_at',{ascending:false}); 
+  if(onlyPublished) q=q.eq('status','published'); 
+  return await q; 
+}
+async function upsertArticle(a) { 
+  if (profileData) a.user_id = profileData.user_id;
+  return await _sb.from('articles').upsert(a).select().single(); 
+}
 async function deleteArticle(id) { return await _sb.from('articles').delete().eq('id',id); }
 async function uploadFile(bucket,path,file) { return await _sb.storage.from(bucket).upload(path,file,{upsert:true}); }
 function getPublicUrl(bucket,path) { const {data}=_sb.storage.from(bucket).getPublicUrl(path); return data.publicUrl; }
@@ -664,10 +707,14 @@ let currentLectureFilter = 'all';
     const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
     document.getElementById('dashGreeting').textContent = greet;
 
-    // Portfolio link
-    document.getElementById('portfolioLinkBox').textContent = window.location.origin + '/portfolio/';
-
+    // Initial data load
     await loadAll();
+    
+    // Portfolio link with specific ID
+    if (profileData) {
+      const portUrl = window.location.origin + '/portfolio/?id=' + profileData.id;
+      document.getElementById('portfolioLinkBox').textContent = portUrl;
+    }
 
     document.getElementById('loadingScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'flex';
@@ -686,7 +733,15 @@ async function loadAll() {
 
 // ── Profile ─────────────────────────────────────────────────────
 async function loadProfile() {
-  const { data } = await getProfile();
+  let { data, error } = await getProfile();
+  if (error) { console.error('Fetch error:', error); return; }
+  
+  if (!data) {
+    console.log('No profile found, creating default...');
+    const resp = await createDefaultProfile();
+    data = resp.data;
+  }
+  
   if (!data) return;
   profileData = data;
 
@@ -1203,8 +1258,38 @@ function setLang(lang, btn) {
 
 // ── Portfolio link ─────────────────────────────────────────────────
 function copyPortfolioLink() {
-  const link = window.location.origin + '/portfolio/';
-  navigator.clipboard.writeText(link).then(() => showToast('Link copied!', 'success'));
+  if (!profileData || !profileData.id) {
+    showToast('Profile not loaded', 'error');
+    return;
+  }
+  const link = window.location.origin + '/portfolio/?id=' + profileData.id;
+  
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(link).then(() => {
+      showToast('Link copied to clipboard!', 'success');
+    }).catch(err => {
+      console.error('Clipboard error:', err);
+      fallbackCopyTextToClipboard(link);
+    });
+  } else {
+    fallbackCopyTextToClipboard(link);
+  }
+}
+
+function fallbackCopyTextToClipboard(text) {
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try {
+    const successful = document.execCommand('copy');
+    if (successful) showToast('Link copied! (Fallback)', 'success');
+    else showToast('Failed to copy link', 'error');
+  } catch (err) {
+    showToast('Failed to copy', 'error');
+  }
+  document.body.removeChild(textArea);
 }
 
 // ── Modal helpers ─────────────────────────────────────────────────

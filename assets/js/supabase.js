@@ -77,7 +77,10 @@ window.requireAuth = async function() {
 // DATA HELPERS - Attached to window
 // ============================================================
 
-window.getProfile = async function() {
+window.getProfile = async function(id = null) {
+  if (id) {
+    return await supabase.from('profile').select('*').eq('id', id).maybeSingle();
+  }
   return await supabase.from('profile').select('*').single();
 };
 
@@ -85,8 +88,9 @@ window.upsertProfile = async function(profile) {
   return await supabase.from('profile').upsert(profile, { onConflict: 'id' }).select().single();
 };
 
-window.getLectures = async function(filters = {}) {
+window.getLectures = async function(userId = null, filters = {}) {
   let query = supabase.from('lectures').select('*').order('created_at', { ascending: false });
+  if (userId) query = query.eq('user_id', userId);
   if (filters.category) query = query.eq('category', filters.category);
   return await query;
 };
@@ -99,8 +103,10 @@ window.deleteLecture = async function(id) {
   return await supabase.from('lectures').delete().eq('id', id);
 };
 
-window.getPublications = async function() {
-  return await supabase.from('publications').select('*').order('year', { ascending: false });
+window.getPublications = async function(userId = null) {
+  let query = supabase.from('publications').select('*').order('year', { ascending: false });
+  if (userId) query = query.eq('user_id', userId);
+  return await query;
 };
 
 window.upsertPublication = async function(pub) {
@@ -111,8 +117,10 @@ window.deletePublication = async function(id) {
   return await supabase.from('publications').delete().eq('id', id);
 };
 
-window.getCourses = async function() {
-  return await supabase.from('courses').select('*').order('created_at', { ascending: false });
+window.getCourses = async function(userId = null) {
+  let query = supabase.from('courses').select('*').order('created_at', { ascending: false });
+  if (userId) query = query.eq('user_id', userId);
+  return await query;
 };
 
 window.upsertCourse = async function(course) {
@@ -123,9 +131,10 @@ window.deleteCourse = async function(id) {
   return await supabase.from('courses').delete().eq('id', id);
 };
 
-window.getArticles = async function(onlyPublished = false) {
+window.getArticles = async function(onlyPublished = false, userId = null) {
   let query = supabase.from('articles').select('*').order('created_at', { ascending: false });
   if (onlyPublished) query = query.eq('status', 'published');
+  if (userId) query = query.eq('user_id', userId);
   return await query;
 };
 
