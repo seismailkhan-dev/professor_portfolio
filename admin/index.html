@@ -617,7 +617,11 @@ const SUPABASE_ANON_KEY = 'sb_publishable_23hymXGOQ4yR02pBk8ndwQ_ux_Dnz8z';
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Helper functions
-async function getProfile() { return await _sb.from('profile').select('*').single(); }
+async function getProfile() {
+  const { data, error } = await _sb.from('profile').select('*').order('created_at', { ascending: true }).limit(1);
+  if (error) return { data: null, error };
+  return { data: data && data.length > 0 ? data[0] : null, error: null };
+}
 async function upsertProfile(p) { return await _sb.from('profile').upsert(p, { onConflict: 'id' }).select().single(); }
 async function getLectures(f={}) { let q = _sb.from('lectures').select('*').order('created_at',{ascending:false}); if(f.category) q=q.eq('category',f.category); return await q; }
 async function upsertLecture(l) { return await _sb.from('lectures').upsert(l).select().single(); }
