@@ -737,6 +737,14 @@ async function loadProfile() {
     setFieldValue('contactLinkedin', data.linkedin_url);
     setFieldValue('contactResearchgate', data.researchgate_url);
     setFieldValue('contactUnivUrl', data.univ_profile_url);
+
+    // Update CV info if exists
+    if (data.cv_url) {
+      document.getElementById('cvCurrentFile').style.display = 'flex';
+      document.getElementById('cvFileName').textContent = 'professor_cv.pdf';
+      document.getElementById('cvFileDate').textContent = data.cv_updated ? 'Updated: ' + new Date(data.cv_updated).toLocaleDateString() : '';
+      document.getElementById('cvDownloadLink').href = data.cv_url;
+    }
   }
 }
 
@@ -1133,17 +1141,18 @@ function editArticle(article) {
 // ── CV ───────────────────────────────────────────────────────────
 async function uploadCV(input) {
   if (!input.files[0]) return;
+  if (!profileData || !profileData.id) {
+    showToast('Profile not loaded yet.', 'error');
+    return;
+  }
   const file = input.files[0];
   showToast('Uploading CV...', 'info');
   const { error } = await uploadFile('cv', 'professor_cv.pdf', file);
   if (error) { showToast('Upload failed: ' + error.message, 'error'); return; }
   const url = getPublicUrl('cv', 'professor_cv.pdf');
-  await upsertProfile({ cv_url: url, cv_updated: new Date().toISOString() });
-
-  document.getElementById('cvCurrentFile').style.display = 'flex';
-  document.getElementById('cvFileName').textContent = file.name;
-  document.getElementById('cvFileDate').textContent = 'Updated: ' + new Date().toLocaleDateString();
-  document.getElementById('cvDownloadLink').href = url;
+  await upsertProfile({ id: profileData.id, cv_url: url, cv_updated: new Date().toISOString() });
+  
+  await loadProfile();
   showToast('CV uploaded successfully!', 'success');
 }
 
